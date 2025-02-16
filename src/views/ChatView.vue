@@ -1,13 +1,14 @@
 <script setup>
 import ChatInput from '@/components/ChatInput.vue'
 import ChatMessage from '@/components/ChatMessage.vue'
-import { Setting, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { computed, ref, watch, nextTick, onMounted } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { messageHandler } from '@/utils/messageHandler'
 import { createChatCompletion } from '@/utils/api'
 import { useSettingStore } from '@/stores/setting'
 import SettingsPanel from '@/components/SettingsPanel.vue'
+import PopupMenu from '@/components/PopupMenu.vue'
 
 // 获取聊天消息
 const chatStore = useChatStore()
@@ -123,6 +124,8 @@ const handleRegenerate = async () => {
 
 // 添加抽屉引用
 const settingDrawer = ref(null)
+// 添加弹出框引用
+const popupMenu = ref(null)
 </script>
 
 <template>
@@ -131,13 +134,16 @@ const settingDrawer = ref(null)
     <!-- 聊天头部 -->
     <div class="chat-header">
       <div class="header-left">
+        <PopupMenu ref="popupMenu" />
         <el-button class="new-chat-btn" :icon="Plus">新对话</el-button>
         <div class="divider"></div>
         <h1 class="chat-title">LLM Chat</h1>
       </div>
 
       <div class="header-right">
-        <el-button circle :icon="Setting" @click="settingDrawer.openDrawer()" />
+        <button class="action-btn" @click="settingDrawer.openDrawer()">
+          <img src="@/assets/photo/设置.png" alt="settings" />
+        </button>
       </div>
     </div>
 
@@ -188,6 +194,32 @@ const settingDrawer = ref(null)
     display: flex;
     align-items: center;
     gap: 1rem;
+
+    .action-btn {
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      img {
+        width: 1.4rem;
+        height: 1.4rem;
+        opacity: 1;
+        transition: filter 0.2s;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+    }
 
     .new-chat-btn {
       /* 基础尺寸设置 */
@@ -242,9 +274,34 @@ const settingDrawer = ref(null)
     display: flex;
     gap: 0.5rem;
 
-    :deep(.el-button) {
-      height: 2rem;
+    .action-btn {
       width: 2rem;
+      height: 2rem;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      img {
+        width: 1.25rem;
+        height: 1.25rem;
+        opacity: 1;
+        transition: filter 0.2s;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+        img {
+          filter: brightness(0.4);
+        }
+      }
     }
   }
 }
