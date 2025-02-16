@@ -1,0 +1,48 @@
+// :root 选择器通常用于定义全局 CSS 变量（也称为自定义属性）,整个文档中被引用和使用，可以通过 var() 函数来引用这些变量
+:root {
+  // 基础颜色
+  --text-color: #000000;
+  --text-color-secondary: #bbbfc4;
+  --bg-color: #ffffff;
+  --border-color: #c5c5c5;
+
+  // 代码相关的颜色和字体
+  --code-font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  --code-lang-text: #000000;
+  --code-block-bg: #fcfcfc;
+  --code-header-bg: #f3f4f6;
+  --code-border: #ebebeb;
+  --code-text: #383a42; /* 添加默认代码文本颜色 - 接近黑色 */
+  --code-header-button-hover-bg: #e5e6e8;
+}
+
+/* 代码块的暗色主题 */
+.code-block {
+  /* 明亮模式下的代码文本颜色 */
+  pre.hljs {
+    color: var(--code-text);
+  }
+}
+
+.code-block.dark-theme {
+  --code-block-bg: #282c34; /* atom-one-dark 的背景色 */
+  --code-header-bg: #21252b; /* 略深一点的头部背景色 */
+  --code-border: #181a1f; /* 更深的边框色 */
+  --code-lang-text: #abb2bf; /* atom-one-dark 的默认文本色 */
+  --code-header-button-hover-bg: #2c313a;
+  --code-text: #abb2bf;
+
+  pre.hljs {
+    background-color: var(--code-block-bg);
+    /* atom-one-dark 主题会自动处理暗色模式的文本颜色 */
+  }
+
+  .code-header {
+    background-color: var(--code-header-bg);
+    border-color: var(--code-border);
+
+    .code-lang {
+      color: var(--code-lang-text);
+    }
+  }
+}
