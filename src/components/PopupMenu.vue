@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
+import { useChatStore } from '@/stores/chat'
 
 const isVisible = ref(false)
+const chatStore = useChatStore()
 
 // 处理点击事件
 const handleClickOutside = (event) => {
@@ -27,6 +29,18 @@ const toggle = () => {
   isVisible.value = !isVisible.value
 }
 
+// 创建新对话
+const handleNewChat = () => {
+  chatStore.createConversation()
+  isVisible.value = false
+}
+
+// 切换对话
+const handleSwitchChat = (conversationId) => {
+  chatStore.switchConversation(conversationId)
+  isVisible.value = false
+}
+
 // 导出方法供父组件调用
 defineExpose({
   toggle,
@@ -45,15 +59,21 @@ defineExpose({
     >
       <div class="popup-menu" v-show="isVisible">
         <div class="menu-section">
-          <el-button class="new-chat-btn" :icon="Plus">新对话</el-button>
+          <el-button class="new-chat-btn" :icon="Plus" @click="handleNewChat">新对话</el-button>
         </div>
         <div class="divider"></div>
         <div class="menu-section">
           <div class="section-title">历史对话</div>
           <div class="history-list">
-            <div class="menu-item">
+            <div
+              v-for="conversation in chatStore.conversations"
+              :key="conversation.id"
+              class="menu-item"
+              :class="{ active: conversation.id === chatStore.currentConversationId }"
+              @click="handleSwitchChat(conversation.id)"
+            >
               <img src="@/assets/photo/对话.png" alt="" />
-              <span>日常问候</span>
+              <span>{{ conversation.title }}</span>
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ import PopupMenu from '@/components/PopupMenu.vue'
 
 // 获取聊天消息
 const chatStore = useChatStore()
-const messages = computed(() => chatStore.messages)
+const currentMessages = computed(() => chatStore.currentMessages)
 const isLoading = computed(() => chatStore.isLoading)
 const settingStore = useSettingStore()
 
@@ -20,7 +20,7 @@ const settingStore = useSettingStore()
 const messagesContainer = ref(null)
 // 监听消息变化，滚动到底部
 watch(
-  messages,
+  currentMessages,
   () => {
     nextTick(() => {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
@@ -49,7 +49,7 @@ const handleSend = async (content) => {
     lastMessage.loading = true
 
     // 调用API获取回复
-    const messages = chatStore.messages.map(({ role, content }) => ({ role, content }))
+    const messages = chatStore.currentMessages.map(({ role, content }) => ({ role, content }))
     const response = await createChatCompletion(messages)
 
     if (settingStore.settings.stream) {
@@ -113,9 +113,9 @@ const handleSend = async (content) => {
 const handleRegenerate = async () => {
   try {
     // 获取最后一条用户消息
-    const lastUserMessage = chatStore.messages[chatStore.messages.length - 2]
+    const lastUserMessage = chatStore.currentMessages[chatStore.currentMessages.length - 2]
     // 使用 splice 删除最后两个元素
-    chatStore.messages.splice(-2, 2)
+    chatStore.currentMessages.splice(-2, 2)
     await handleSend(lastUserMessage.content)
   } catch (error) {
     console.error('Failed to regenerate message:', error)
@@ -149,12 +149,14 @@ const popupMenu = ref(null)
 
     <!-- 消息容器，显示对话消息 -->
     <div class="messages-container" ref="messagesContainer">
-      <template v-if="messages.length > 0">
+      <template v-if="currentMessages.length > 0">
         <chat-message
-          v-for="(message, index) in messages"
+          v-for="(message, index) in currentMessages"
           :key="message.id"
           :message="message"
-          :is-last-assistant-message="index === messages.length - 1 && message.role === 'assistant'"
+          :is-last-assistant-message="
+            index === currentMessages.length - 1 && message.role === 'assistant'
+          "
           @regenerate="handleRegenerate"
         />
       </template>
