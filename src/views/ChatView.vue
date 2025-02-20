@@ -38,10 +38,12 @@ onMounted(() => {
 })
 
 // 发送消息
-const handleSend = async (content) => {
+const handleSend = async (messageContent) => {
   try {
-    // 添加用户消息
-    chatStore.addMessage(messageHandler.formatMessage('user', content))
+    // 添加用户消息，包含文本内容和文件
+    chatStore.addMessage(
+      messageHandler.formatMessage('user', messageContent.text, messageContent.files),
+    )
     chatStore.addMessage(messageHandler.formatMessage('assistant', ''))
 
     // 设置loading状态
@@ -117,7 +119,7 @@ const handleRegenerate = async () => {
     const lastUserMessage = chatStore.currentMessages[chatStore.currentMessages.length - 2]
     // 使用 splice 删除最后两个元素
     chatStore.currentMessages.splice(-2, 2)
-    await handleSend(lastUserMessage.content)
+    await handleSend({ text: lastUserMessage.content })
   } catch (error) {
     console.error('Failed to regenerate message:', error)
   }

@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { renderMarkdown } from '@/utils/markdown'
+import { Document } from '@element-plus/icons-vue'
 // 导入图片资源
 import copyIcon from '@/assets/photo/复制.png'
 import successIcon from '@/assets/photo/成功.png'
@@ -156,6 +157,23 @@ const renderedContent = computed(() => {
 <template>
   <div class="message-item" :class="{ 'is-mine': message.role === 'user' }">
     <div class="content">
+      <!-- 文件预览区域 -->
+      <div v-if="message.files && message.files.length > 0" class="files-container">
+        <div v-for="file in message.files" :key="file.url" class="file-item">
+          <!-- 图片预览 -->
+          <div v-if="file.type === 'image'" class="image-preview">
+            <img :src="file.url" :alt="file.name" />
+          </div>
+          <!-- 文件预览 -->
+          <div v-else class="file-preview">
+            <el-icon><Document /></el-icon>
+            <span class="file-name">{{ file.name }}</span>
+            <span class="file-size">{{ (file.size / 1024).toFixed(1) }}KB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 消息内容 -->
       <div v-if="message.loading && message.role === 'assistant'" class="thinking-text">
         <img src="@/assets/photo/加载中.png" alt="loading" class="loading-icon" />
         <span>内容生成中...</span>
@@ -496,6 +514,48 @@ const renderedContent = computed(() => {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+.files-container {
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .file-item {
+    .image-preview {
+      max-width: 200px; /* 限制最大宽度 */
+      border-radius: 8px;
+      overflow: hidden;
+
+      img {
+        display: block; /* 移除图片底部的间隙 */
+        max-width: 100%; /* 限制最大宽度 */
+        height: auto; /* 高度自适应，保持原比例 */
+      }
+    }
+
+    .file-preview {
+      padding: 8px;
+      background-color: #f4f4f5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .file-name {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .file-size {
+        color: #909399;
+        font-size: 12px;
+      }
+    }
   }
 }
 </style>

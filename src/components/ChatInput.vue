@@ -19,13 +19,20 @@ const emit = defineEmits(['send'])
 
 // 处理发送消息的方法
 const handleSend = () => {
-  // 如果消息为空或正在加载中，则不发送
-  if (!inputValue.value.trim() || props.loading) return
+  if ((!inputValue.value.trim() && fileList.value.length === 0) || props.loading) return
+
+  // 构建消息对象
+  const messageContent = {
+    text: inputValue.value.trim(),
+    files: fileList.value,
+  }
 
   // 触发 send 事件，将消息内容作为参数传递
-  emit('send', inputValue.value)
-  // 清空输入框
+  emit('send', messageContent)
+
+  // 清空输入框和文件列表
   inputValue.value = ''
+  fileList.value = []
 }
 
 // 处理换行的方法（Shift + Enter）
