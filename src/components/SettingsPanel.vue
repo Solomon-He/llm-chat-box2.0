@@ -60,6 +60,41 @@ defineExpose({
         </el-select>
       </div>
 
+      <!-- 流式响应开关 -->
+      <div class="setting-item">
+        <div class="setting-label-row">
+          <div class="label-with-tooltip">
+            <span>流式响应</span>
+            <el-tooltip content="开启后将流式响应 AI 的回复" placement="top">
+              <el-icon><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </div>
+          <el-switch v-model="settingStore.settings.stream" />
+        </div>
+      </div>
+
+      <!-- API Key -->
+      <div class="setting-item">
+        <div class="setting-label-row">
+          <div class="label-with-tooltip">
+            <span>API Key</span>
+            <el-tooltip content="设置 API Key" placement="top">
+              <el-icon><QuestionFilled /></el-icon>
+            </el-tooltip>
+          </div>
+
+          <a href="https://cloud.siliconflow.cn/account/ak" target="_blank" class="get-key-link">
+            获取 API Key
+          </a>
+        </div>
+        <el-input
+          v-model="settingStore.settings.apiKey"
+          type="password"
+          placeholder="请输入 API Key"
+          show-password
+        />
+      </div>
+
       <!-- Max Tokens -->
       <div class="setting-item">
         <div class="setting-label">
@@ -74,6 +109,7 @@ defineExpose({
             :min="1"
             :max="currentMaxTokens"
             :step="1"
+            :show-tooltip="false"
             class="setting-slider"
           />
           <el-input-number
@@ -100,6 +136,7 @@ defineExpose({
             :min="0"
             :max="2"
             :step="0.1"
+            :show-tooltip="false"
             class="setting-slider"
           />
           <el-input-number
@@ -126,6 +163,7 @@ defineExpose({
             :min="0"
             :max="1"
             :step="0.1"
+            :show-tooltip="false"
             class="setting-slider"
           />
           <el-input-number
@@ -152,6 +190,7 @@ defineExpose({
             :min="1"
             :max="100"
             :step="1"
+            :show-tooltip="false"
             class="setting-slider"
           />
           <el-input-number
@@ -176,33 +215,62 @@ defineExpose({
 .setting-item {
   margin-bottom: 24px;
 
+  // 基础标签样式
   .setting-label {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     margin-bottom: 8px;
     font-weight: 500;
     color: #27272a;
   }
 
+  // 水平布局的标签行，用于标签和控件在同一行的情况
+  .setting-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #27272a;
+
+    // 标签和提示图标的容器
+    .label-with-tooltip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    // 获取 API Key 链接样式
+    .get-key-link {
+      font-size: 14px;
+      color: #3f7af1;
+      text-decoration: none;
+    }
+  }
+
+  // 控件容器样式，用于包含滑块和数字输入框
   .setting-control {
     display: flex;
     align-items: center;
     gap: 16px;
 
+    // 滑块占据剩余空间
     .setting-slider {
       flex: 1;
     }
 
+    // 数字输入框固定宽度
     :deep(.el-input-number) {
       width: 120px;
     }
   }
 
+  // 模型选择下拉框宽度
   .model-select {
     width: 100%;
   }
 
+  // 下拉选项文字颜色
   :deep(.el-select-dropdown__item) {
     color: #27272a;
   }

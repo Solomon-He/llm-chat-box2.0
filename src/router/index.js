@@ -5,16 +5,16 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/chat',
     },
     {
       path: '/home',
-      component: () => import('@/views/HomePage.vue')
+      component: () => import('@/views/HomePage.vue'),
     },
     {
       path: '/chat',
-      component: () => import('@/views/ChatView.vue')
-    }
+      component: () => import('@/views/ChatView.vue'),
+    },
   ],
 })
 
