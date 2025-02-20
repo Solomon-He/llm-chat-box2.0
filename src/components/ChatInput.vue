@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
+import { Close, Document } from '@element-plus/icons-vue'
 
 // 输入框的值，使用 ref 实现响应式
 const inputValue = ref('')
+const fileList = ref([]) // 存储上传的文件列表
 
 // 定义组件的 props，接收 loading 状态
 const props = defineProps({
@@ -31,10 +33,56 @@ const handleNewline = (e) => {
   e.preventDefault() // 阻止默认的 Enter 发送行为
   inputValue.value += '\n' // 在当前位置添加换行符
 }
+
+// 处理文件上传
+const handleFileUpload = (uploadFile) => {
+  // 确保获取到的是文件对象
+  const file = uploadFile.raw
+  if (!file) return false
+
+  fileList.value.push({
+    name: file.name,
+    url: URL.createObjectURL(file),
+    type: file.type.startsWith('image/') ? 'image' : 'file',
+    size: file.size,
+  })
+  return false // 阻止自动上传
+}
+
+// 移除文件
+const handleFileRemove = (file) => {
+  const index = fileList.value.findIndex((item) => item.url === file.url)
+  if (index !== -1) {
+    URL.revokeObjectURL(fileList.value[index].url)
+    fileList.value.splice(index, 1)
+  }
+}
 </script>
 
 <template>
   <div class="chat-input-wrapper">
+    <!-- 文件预览区域 -->
+    <div v-if="fileList.length > 0" class="preview-area">
+      <div v-for="file in fileList" :key="file.url" class="preview-item">
+        <!-- 图片预览 -->
+        <div v-if="file.type === 'image'" class="image-preview">
+          <img :src="file.url" :alt="file.name" />
+          <div class="remove-btn" @click="handleFileRemove(file)">
+            <el-icon><Close /></el-icon>
+          </div>
+        </div>
+        <!-- 文件预览 -->
+        <div v-else class="file-preview">
+          <el-icon><Document /></el-icon>
+          <span class="file-name">{{ file.name }}</span>
+          <span class="file-size">{{ (file.size / 1024).toFixed(1) }}KB</span>
+          <div class="remove-btn" @click="handleFileRemove(file)">
+            <el-icon><Close /></el-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <el-input
       v-model="inputValue"
       type="textarea"
@@ -45,12 +93,28 @@ const handleNewline = (e) => {
       @keydown.enter.shift="handleNewline"
     />
     <div class="button-group">
-      <button class="action-btn">
-        <img src="@/assets/photo/附件.png" alt="link" />
-      </button>
-      <button class="action-btn">
-        <img src="@/assets/photo/图片.png" alt="picture" />
-      </button>
+      <el-upload
+        class="upload-btn"
+        :auto-upload="false"
+        :show-file-list="false"
+        :on-change="handleFileUpload"
+        accept=".pdf,.doc,.docx,.txt"
+      >
+        <button class="action-btn">
+          <img src="@/assets/photo/附件.png" alt="link" />
+        </button>
+      </el-upload>
+      <el-upload
+        class="upload-btn"
+        :auto-upload="false"
+        :show-file-list="false"
+        :on-change="handleFileUpload"
+        accept="image/*"
+      >
+        <button class="action-btn">
+          <img src="@/assets/photo/图片.png" alt="picture" />
+        </button>
+      </el-upload>
       <div class="divider"></div>
       <button class="action-btn send-btn" :disabled="props.loading" @click="handleSend">
         <img src="@/assets/photo/发送.png" alt="send" />
@@ -66,6 +130,78 @@ const handleNewline = (e) => {
   border: 1px solid var(--border-color);
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* 预览区域容器样式 */
+  .preview-area {
+    margin-bottom: 8px; /* 与输入框的间距 */
+    display: flex; /* 使用弹性布局 */
+    flex-wrap: wrap; /* 允许多行显示 */
+    gap: 8px; /* 预览项之间的间距 */
+
+    /* 预览项容器样式 */
+    .preview-item {
+      position: relative; /* 为删除按钮定位做准备 */
+      border-radius: 8px; /* 圆角边框 */
+      overflow: hidden; /* 隐藏超出部分 */
+
+      /* 图片预览样式 */
+      .image-preview {
+        width: 60px; /* 固定宽度 */
+        height: 60px; /* 固定高度，保持正方形 */
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover; /* 保持图片比例并填充容器 */
+        }
+      }
+
+      /* 文件预览样式 */
+      .file-preview {
+        padding: 8px; /* 内边距 */
+        background-color: #f4f4f5; /* 浅灰色背景 */
+        border-radius: 8px; /* 圆角边框 */
+        display: flex; /* 使用弹性布局 */
+        align-items: center; /* 垂直居中对齐 */
+        gap: 8px; /* 元素间距 */
+
+        /* 文件名样式 */
+        .file-name {
+          max-width: 120px; /* 限制最大宽度 */
+          overflow: hidden; /* 隐藏超出部分 */
+          text-overflow: ellipsis; /* 超出显示省略号 */
+          white-space: nowrap; /* 不换行 */
+        }
+
+        /* 文件大小样式 */
+        .file-size {
+          color: #909399; /* 浅灰色文字 */
+          font-size: 12px; /* 小字体 */
+        }
+      }
+
+      /* 删除按钮样式 */
+      .remove-btn {
+        position: absolute; /* 绝对定位 */
+        top: 4px; /* 距顶部距离 */
+        right: 4px; /* 距右侧距离 */
+        width: 20px; /* 固定宽度 */
+        height: 20px; /* 固定高度，保持正圆形 */
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+        border-radius: 50%; /* 圆形按钮 */
+        display: flex; /* 使用弹性布局 */
+        align-items: center; /* 垂直居中 */
+        justify-content: center; /* 水平居中 */
+        cursor: pointer; /* 鼠标指针样式 */
+        color: white; /* 图标颜色 */
+
+        /* 鼠标悬停效果 */
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.7); /* 加深背景色 */
+        }
+      }
+    }
+  }
 
   /* 自定义输入框样式 */
   :deep(.el-textarea__inner) {
@@ -87,6 +223,10 @@ const handleNewline = (e) => {
     margin-top: 0.25rem; /* 与输入框的上方间距 */
     gap: 0.5rem; /* 按钮之间的间距 */
     align-items: center; /* 垂直居中对齐，让分隔线居中 */
+
+    .upload-btn {
+      display: inline-block;
+    }
 
     /* 分隔线样式 */
     .divider {
