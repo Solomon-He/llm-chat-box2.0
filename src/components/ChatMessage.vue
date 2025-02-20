@@ -156,6 +156,10 @@ const renderedContent = computed(() => {
 <template>
   <div class="message-item" :class="{ 'is-mine': message.role === 'user' }">
     <div class="content">
+      <div v-if="message.loading && message.role === 'assistant'" class="thinking-text">
+        <img src="@/assets/photo/加载中.png" alt="loading" class="loading-icon" />
+        <span>内容生成中...</span>
+      </div>
       <div class="bubble markdown-body" v-html="renderedContent"></div>
       <!-- 只在 AI 助手消息中显示操作按钮和 tokens 信息 -->
       <div v-if="message.role === 'assistant' && message.loading === false" class="message-actions">
@@ -468,6 +472,30 @@ const renderedContent = computed(() => {
         border-radius: 0.25rem;
       }
     }
+  }
+
+  .thinking-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.75rem 1rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+
+    .loading-icon {
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>
