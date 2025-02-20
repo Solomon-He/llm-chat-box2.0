@@ -9,6 +9,7 @@ import { createChatCompletion } from '@/utils/api'
 import { useSettingStore } from '@/stores/setting'
 import SettingsPanel from '@/components/SettingsPanel.vue'
 import PopupMenu from '@/components/PopupMenu.vue'
+import DialogEdit from '@/components/DialogEdit.vue'
 
 // 获取聊天消息
 const chatStore = useChatStore()
@@ -126,6 +127,21 @@ const handleRegenerate = async () => {
 const settingDrawer = ref(null)
 // 添加弹出框引用
 const popupMenu = ref(null)
+
+// 添加新建对话的处理函数
+const handleNewChat = () => {
+  chatStore.createConversation()
+}
+
+// 获取当前对话标题
+const currentTitle = computed(() => chatStore.currentConversation?.title || 'LLM Chat')
+// 格式化标题
+const formatTitle = (title) => {
+  return title.length > 4 ? title.slice(0, 4) + '...' : title
+}
+
+// 添加对话框组件
+const dialogEdit = ref(null)
 </script>
 
 <template>
@@ -135,9 +151,17 @@ const popupMenu = ref(null)
     <div class="chat-header">
       <div class="header-left">
         <PopupMenu ref="popupMenu" />
-        <el-button class="new-chat-btn" :icon="Plus">新对话</el-button>
+        <el-button class="new-chat-btn" :icon="Plus" @click="handleNewChat">新对话</el-button>
         <div class="divider"></div>
-        <h1 class="chat-title">LLM Chat</h1>
+        <div class="title-wrapper">
+          <h1 class="chat-title">{{ formatTitle(currentTitle) }}</h1>
+          <button
+            class="edit-btn"
+            @click="dialogEdit.openDialog(chatStore.currentConversationId, 'edit')"
+          >
+            <img src="@/assets/photo/编辑.png" alt="edit" />
+          </button>
+        </div>
       </div>
 
       <div class="header-right">
@@ -172,6 +196,9 @@ const popupMenu = ref(null)
 
     <!-- 设置面板 -->
     <SettingsPanel ref="settingDrawer" />
+
+    <!-- 添加对话框组件 -->
+    <DialogEdit ref="dialogEdit" />
   </div>
 </template>
 
@@ -264,11 +291,43 @@ const popupMenu = ref(null)
       margin: 0 0.2rem; /* 设置左右间距 */
     }
 
-    .chat-title {
-      margin: 0;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-color-primary);
+    .title-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .chat-title {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-color-primary);
+      }
+
+      .edit-btn {
+        opacity: 0;
+        width: 0.9rem;
+        height: 0.9rem;
+        padding: 0;
+        border: none;
+        background: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s ease;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      &:hover {
+        .edit-btn {
+          opacity: 1;
+        }
+      }
     }
   }
 

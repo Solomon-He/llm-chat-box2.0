@@ -77,6 +77,27 @@ export const useChatStore = defineStore(
       return null
     }
 
+    // 更新对话标题
+    const updateConversationTitle = (conversationId, newTitle) => {
+      const conversation = conversations.value.find((c) => c.id === conversationId)
+      if (conversation) {
+        conversation.title = newTitle
+      }
+    }
+
+    // 删除对话
+    const deleteConversation = (conversationId) => {
+      const index = conversations.value.findIndex((c) => c.id === conversationId)
+      if (index !== -1) {
+        conversations.value.splice(index, 1)
+
+        // 如果删除的是当前对话，切换到第一个对话
+        if (conversationId === currentConversationId.value) {
+          currentConversationId.value = conversations.value[0]?.id || null
+        }
+      }
+    }
+
     return {
       conversations,
       currentConversationId,
@@ -89,6 +110,8 @@ export const useChatStore = defineStore(
       getLastMessage,
       createConversation,
       switchConversation,
+      updateConversationTitle,
+      deleteConversation,
     }
   },
   {
