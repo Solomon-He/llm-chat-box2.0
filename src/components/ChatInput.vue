@@ -19,7 +19,7 @@ const emit = defineEmits(['send'])
 
 // 处理发送消息的方法
 const handleSend = () => {
-  if ((!inputValue.value.trim() && fileList.value.length === 0) || props.loading) return
+  if (!inputValue.value.trim() || props.loading) return
 
   // 构建消息对象
   const messageContent = {

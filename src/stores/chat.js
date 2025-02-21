@@ -91,9 +91,13 @@ export const useChatStore = defineStore(
       if (index !== -1) {
         conversations.value.splice(index, 1)
 
+        // 如果删除后没有对话了，创建一个新对话
+        if (conversations.value.length === 0) {
+          createConversation()
+        }
         // 如果删除的是当前对话，切换到第一个对话
-        if (conversationId === currentConversationId.value) {
-          currentConversationId.value = conversations.value[0]?.id || null
+        else if (conversationId === currentConversationId.value) {
+          currentConversationId.value = conversations.value[0].id
         }
       }
     }

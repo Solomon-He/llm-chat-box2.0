@@ -30,11 +30,15 @@ watch(
   { deep: true },
 )
 
-// 每次页面刷新时，将消息容器滚动到底部
 onMounted(() => {
+  // 每次页面刷新时，将消息容器滚动到底部
   nextTick(() => {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
   })
+  // 当没有对话时，默认新建一个对话
+  if (chatStore.currentMessages.length === 0) {
+    chatStore.createConversation()
+  }
 })
 
 // 发送消息
@@ -119,7 +123,7 @@ const handleRegenerate = async () => {
     const lastUserMessage = chatStore.currentMessages[chatStore.currentMessages.length - 2]
     // 使用 splice 删除最后两个元素
     chatStore.currentMessages.splice(-2, 2)
-    await handleSend({ text: lastUserMessage.content })
+    await handleSend({ text: lastUserMessage.content, files: lastUserMessage.files })
   } catch (error) {
     console.error('Failed to regenerate message:', error)
   }
