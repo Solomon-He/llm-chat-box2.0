@@ -10,6 +10,7 @@ import { useSettingStore } from '@/stores/setting'
 import SettingsPanel from '@/components/SettingsPanel.vue'
 import PopupMenu from '@/components/PopupMenu.vue'
 import DialogEdit from '@/components/DialogEdit.vue'
+import { useRouter } from 'vue-router'
 
 // 获取聊天消息
 const chatStore = useChatStore()
@@ -36,7 +37,7 @@ onMounted(() => {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
   })
   // 当没有对话时，默认新建一个对话
-  if (chatStore.currentMessages.length === 0) {
+  if (chatStore.conversations.length === 0) {
     chatStore.createConversation()
   }
 })
@@ -110,6 +111,14 @@ const formatTitle = (title) => {
 
 // 添加对话框组件
 const dialogEdit = ref(null)
+
+// 获取路由实例
+const router = useRouter()
+
+// 处理返回首页
+const handleBack = async () => {
+  router.push('/')
+}
 </script>
 
 <template>
@@ -133,9 +142,16 @@ const dialogEdit = ref(null)
       </div>
 
       <div class="header-right">
-        <button class="action-btn" @click="settingDrawer.openDrawer()">
-          <img src="@/assets/photo/设置.png" alt="settings" />
-        </button>
+        <el-tooltip content="设置" placement="top">
+          <button class="action-btn" @click="settingDrawer.openDrawer()">
+            <img src="@/assets/photo/设置.png" alt="settings" />
+          </button>
+        </el-tooltip>
+        <el-tooltip content="回到首页" placement="top">
+          <button class="action-btn" @click="handleBack">
+            <img src="@/assets/photo/返回.png" alt="back" />
+          </button>
+        </el-tooltip>
       </div>
     </div>
 
@@ -153,7 +169,11 @@ const dialogEdit = ref(null)
         />
       </template>
       <div v-else class="empty-state">
-        <el-empty description="开始对话吧" />
+        <div class="empty-content">
+          <img src="@/assets/photo/对话.png" alt="chat" class="empty-icon" />
+          <h2>开始对话吧</h2>
+          <p>有什么想和我聊的吗？</p>
+        </div>
       </div>
     </div>
 
@@ -368,6 +388,31 @@ const dialogEdit = ref(null)
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem;
+
+  .empty-content {
+    text-align: center;
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      opacity: 0.6;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text-color-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: var(--text-color-secondary);
+      margin: 0;
+    }
+  }
 }
 
 /* 添加输入框容器样式 */

@@ -1,13 +1,7 @@
-<script setup>
-
-</script>
-
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
-      <component :is="Component" />
-    </transition>
-  </router-view>
+  <router-view></router-view>
 </template>
 
-<style scoped></style>
+<style>
+/* 移除所有过渡动画相关的样式 */
+</style>
