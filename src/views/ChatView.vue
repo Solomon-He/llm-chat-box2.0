@@ -59,52 +59,14 @@ const handleSend = async (messageContent) => {
     const messages = chatStore.currentMessages.map(({ role, content }) => ({ role, content }))
     const response = await createChatCompletion(messages)
 
-    if (settingStore.settings.stream) {
-      console.log('流式响应')
-      // 处理流式响应
-      const reader = response.body.getReader() // 获取流式响应的reader对象
-      const decoder = new TextDecoder() // 创建文本解码器
-      let accumulatedContent = '' // 累积的内容
-      let startTime = Date.now() // 记录开始时间
-
-      while (true) {
-        // 读取流式响应的值
-        const { done, value } = await reader.read()
-        // 如果读取完成，则退出循环
-        if (done) break
-
-        // 解码流式响应的值
-        const chunk = decoder.decode(value)
-        // 分割成行，并过滤空行
-        const lines = chunk.split('\n').filter((line) => line.trim() !== '')
-
-        // 遍历行
-        for (const line of lines) {
-          // 如果行是DONE，则跳过
-          if (line === 'data: [DONE]') continue
-          // 如果行以data:开头，则解析JSON
-          if (line.startsWith('data: ')) {
-            const data = JSON.parse(line.slice(5))
-            const content = data.choices[0].delta.content || ''
-            accumulatedContent += content
-
-            // 更新消息内容
-            chatStore.updateLastMessage(
-              accumulatedContent,
-              data.usage?.completion_tokens || 0,
-              ((data.usage?.completion_tokens || 0) / ((Date.now() - startTime) / 1000)).toFixed(2),
-            )
-          }
-        }
-      }
-    } else {
-      // 非流式响应处理
-      chatStore.updateLastMessage(
-        response.choices[0].message.content,
-        response.usage.completion_tokens,
-        response.speed,
-      )
-    }
+    // 使用封装的响应处理函数
+    await messageHandler.handleResponse(
+      response,
+      settingStore.settings.stream,
+      (content, tokens, speed) => {
+        chatStore.updateLastMessage(content, tokens, speed)
+      },
+    )
   } catch (error) {
     console.error('Failed to send message:', error)
     chatStore.updateLastMessage('抱歉，发生了一些错误，请稍后重试。')
