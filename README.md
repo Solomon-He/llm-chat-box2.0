@@ -39,6 +39,7 @@ src/
 │ ├── chat.js # 聊天相关状态
 │ └── setting.js # 设置相关状态
 ├── utils/ # 工具函数
+│ ├── api.js # API 请求封装
 │ ├── markdown.js # Markdown 处理
 │ └── messageHandler.js # 消息处理
 ├── views/ # 页面
