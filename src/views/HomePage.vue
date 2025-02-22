@@ -133,12 +133,14 @@ onUnmounted(() => {
   background-color: var(--el-bg-color); // 头部背景色
 
   .header-left {
+    flex-shrink: 0; // 防止logo被压缩
     .logo-text {
       font-size: 20px;
       font-weight: 600;
       color: #171717;
       cursor: pointer;
       user-select: none;
+      white-space: nowrap; // 防止文字换行
     }
   }
 
@@ -146,18 +148,29 @@ onUnmounted(() => {
     display: flex; // 使用弹性布局
     align-items: center; // 垂直居中对齐
     gap: 16px; // 子元素之间的间距
+    flex: 1; // 占据剩余空间
+    justify-content: flex-end; // 右对齐
 
     .search-container {
+      flex: 1; // 搜索框容器占据剩余空间
+      max-width: 280px; // 最大宽度限制
+      min-width: 40px; // 减小最小宽度
+      margin-left: 16px; // 与logo保持距离
+
       .search-input {
         display: flex; // 搜索框内部使用弹性布局
         align-items: center; // 搜索框内部元素垂直居中
-        width: 240px; // 搜索框固定宽度
+        // max-width: 240px; // 搜索框最小宽度
+        // min-width: 100px; // 搜索框最大宽度
+
+        width: 100%; // 搜索框宽度填充容器
         height: 32px; // 搜索框固定高度
         padding: 0 12px; // 左右内边距
         border-radius: 6px; // 圆角边框
         background-color: #f2f2f2; // Vercel 风格的浅灰色背景
 
         .search-icon {
+          flex-shrink: 0; // 防止图标被压缩
           font-size: 14px; // 搜索图标大小
           color: #8f8f8f; // Vercel 风格的图标颜色
           margin-right: 8px; // 图标右侧间距
@@ -165,6 +178,7 @@ onUnmounted(() => {
 
         input {
           flex: 1; // 输入框占据剩余空间
+          width: 0; // 添加这行，强制输入框从0开始计算宽度
           min-width: 0; // 防止输入框溢出
           border: none; // 移除输入框边框
           outline: none; // 移除输入框轮廓
@@ -178,6 +192,7 @@ onUnmounted(() => {
         }
 
         .shortcut-key {
+          flex-shrink: 0; // 防止快捷键被压缩
           font-size: 12px; // 快捷键文本大小
           color: #171717; // Vercel 风格的快捷键文本颜色
           background-color: #fafafa; // 快捷键白色背景
@@ -192,6 +207,7 @@ onUnmounted(() => {
       display: flex; // 使用弹性布局
       align-items: center; // 垂直居中对齐
       height: 32px; // 与搜索框保持相同高度
+      flex-shrink: 0; // 防止github图标被压缩
     }
 
     .github-icon {

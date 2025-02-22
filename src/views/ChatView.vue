@@ -360,11 +360,12 @@ const handleBack = async () => {
 .messages-container {
   flex: 1; /* 占据剩余空间 */
   overflow-y: auto; /* 垂直方向可滚动 */
-  // padding: 1rem; /* 四周内边距 */
+  padding: 0.6rem; /* 四周内边距 */
   background-color: var(--bg-color-secondary); /* 使用主题变量设置背景色 */
 
   /* 设置最大宽度和居中对齐，与输入框保持一致 */
   max-width: 796px; /* 设置最大宽度 */
+  min-width: 0; /* 设置最小宽度 */
   margin: 0 auto; /* 水平居中 */
   width: 100%; /* 在最大宽度范围内占满宽度 */
 
@@ -424,7 +425,7 @@ const handleBack = async () => {
   right: 0; /* 右边缘对齐 */
   background-color: var(--bg-color); /* 使用主题变量设置背景色 */
   z-index: 10; /* 设置层级，确保输入框始终显示在其他内容之上 */
-  padding: 1rem; /* 添加内边距，让输入框与边缘保持距离 */
+  padding: 0.6rem; /* 添加内边距，让输入框与边缘保持距离 */
   // padding-top: 0; /* 移除顶部内边距，只保留底部和左右的间距 */
 
   /* 添加最大宽度和居中对齐 */

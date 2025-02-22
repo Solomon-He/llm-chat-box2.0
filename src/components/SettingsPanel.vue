@@ -41,7 +41,7 @@ defineExpose({
 </script>
 
 <template>
-  <el-drawer v-model="visible" title="设置" direction="rtl" size="400px">
+  <el-drawer v-model="visible" title="设置" direction="rtl" size="350px">
     <div class="setting-container">
       <!-- 模型选择 -->
       <div class="setting-item">

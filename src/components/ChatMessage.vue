@@ -249,38 +249,41 @@ const renderedReasoning = computed(() => {
     .content .bubble.markdown-body {
       background-color: #f4f4f4; /* 用户消息背景色 */
 
-      /* 用户消息中的代码块样式 */
-      :deep(pre) {
-        background-color: var(--code-block-bg);
-        border: 1px solid var(--code-border); /* 代码块边框 */
-      }
+      // /* 用户消息中的代码块样式 */
+      // :deep(pre) {
+      //   background-color: var(--code-block-bg);
+      //   border: 1px solid var(--code-border); /* 代码块边框 */
+      // }
 
-      /* 用户消息中的行内代码样式 */
-      :deep(code) {
-        background-color: #f0f0f0;
-        font-size: 0.875rem; /* 保持代码字体大小为14px */
-      }
+      // /* 用户消息中的行内代码样式 */
+      // :deep(code) {
+      //   background-color: #f0f0f0;
+      //   font-size: 0.875rem; /* 保持代码字体大小为14px */
+      // }
 
-      /* 用户消息中的引用块样式 */
-      :deep(blockquote) {
-        border-left-color: var(--border-color);
-        color: var(--text-color-secondary);
-      }
+      // /* 用户消息中的引用块样式 */
+      // :deep(blockquote) {
+      //   border-left-color: var(--border-color);
+      //   color: var(--text-color-secondary);
+      // }
 
-      /* 用户消息中的链接样式 */
-      :deep(a) {
-        color: #3f7af1;
-        text-decoration: none;
+      // /* 用户消息中的链接样式 */
+      // :deep(a) {
+      //   color: #3f7af1;
+      //   text-decoration: none;
 
-        &:hover {
-          text-decoration: underline; /* 悬停时显示下划线 */
-        }
-      }
+      //   &:hover {
+      //     text-decoration: underline; /* 悬停时显示下划线 */
+      //   }
+      // }
     }
   }
 
   .content {
     max-width: 100%; /* 限制消息气泡最大宽度 */
+    min-width: 0; // 设置最小宽度
+    width: fit-content; // 宽度适应内容，但不超过max-width
+    overflow: hidden;
 
     .reasoning-toggle {
       display: flex;
@@ -348,13 +351,16 @@ const renderedReasoning = computed(() => {
     }
 
     .bubble.markdown-body {
-      display: inline-block; /* 内联块级元素 */
+      // display: inline-block; /* 内联块级元素 */
+      display: block; // 改为块级元素
+      width: 100%; // 占满容器宽度
       padding: 0.75rem 1rem; /* 气泡内边距 */
       background-color: #ffffff; /* AI助手消息背景色 */
       border-radius: 1rem; /* 气泡圆角 */
       font-size: 1rem; /* 普通文字大小16px */
       line-height: 1.5; /* 文字行高 */
       word-break: break-word; /* 长文本自动换行 */
+      overflow: hidden;
 
       /* 修改代码块容器样式 */
       :deep(.code-block) {
@@ -362,6 +368,7 @@ const renderedReasoning = computed(() => {
         border: 1px solid var(--code-border);
         border-radius: 0.5rem;
         overflow: hidden;
+        width: 100%;
 
         /* 移除默认的 pre 边距 */
         > pre {
@@ -440,6 +447,11 @@ const renderedReasoning = computed(() => {
           margin: 0 !important; /* 确保没有边距 */
           padding: 1rem;
           background-color: var(--code-block-bg);
+          overflow-x: auto; // 添加横向滚动
+          white-space: pre; // 保持代码格式
+          code {
+            white-space: pre; // 保持代码格式
+          }
         }
       }
 
