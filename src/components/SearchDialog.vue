@@ -190,10 +190,8 @@ const handleRegenerate = async () => {
 
 <style lang="scss" scoped>
 .search-dialog {
-  // width: 100%; // 修改为100%宽度
   max-width: 640px; // 设置最大宽度
   min-width: 320px; // 设置最小宽度
-  // height: 100%; // 添加高度100%
   max-height: 600px;
   background: #fff;
   border-radius: 8px;
@@ -204,7 +202,7 @@ const handleRegenerate = async () => {
 
   .search-header {
     flex-shrink: 0; // 防止头部压缩
-    padding: 16px;
+    padding: 12px;
     border-bottom: 1px solid #eaeaea;
 
     .search-input {
@@ -261,14 +259,14 @@ const handleRegenerate = async () => {
 
   .dialog-content {
     flex: 1; // 对话内容区域占据剩余空间
-    padding: 16px;
+    padding: 12px;
     overflow-y: auto; // 允许垂直滚动
     display: flex;
     flex-direction: column;
     gap: 16px;
 
     .initial-message {
-      padding: 16px 12px;
+      padding: 12px 12px;
       color: #000;
       font-size: 14px;
       line-height: 1.5;
