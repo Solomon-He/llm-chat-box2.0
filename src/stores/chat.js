@@ -60,11 +60,12 @@ export const useChatStore = defineStore(
       isLoading.value = value
     }
 
-    const updateLastMessage = (content, completion_tokens, speed) => {
+    const updateLastMessage = (content, reasoning_content, completion_tokens, speed) => {
       if (currentConversation.value?.messages.length > 0) {
         const lastMessage =
           currentConversation.value.messages[currentConversation.value.messages.length - 1]
         lastMessage.content = content
+        lastMessage.reasoning_content = reasoning_content
         lastMessage.completion_tokens = completion_tokens
         lastMessage.speed = speed
       }

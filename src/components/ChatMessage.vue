@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { renderMarkdown } from '@/utils/markdown'
-import { Document } from '@element-plus/icons-vue'
+import { Document, ArrowDown } from '@element-plus/icons-vue'
 // 导入图片资源
 import copyIcon from '@/assets/photo/复制.png'
 import successIcon from '@/assets/photo/成功.png'
@@ -10,6 +10,7 @@ import likeActiveIcon from '@/assets/photo/赞2.png'
 import dislikeIcon from '@/assets/photo/踩.png'
 import dislikeActiveIcon from '@/assets/photo/踩2.png'
 import regenerateIcon from '@/assets/photo/重新生成.png'
+import thinkingIcon from '@/assets/photo/深度思考.png'
 
 // 定义props
 const props = defineProps({
@@ -32,6 +33,14 @@ const isCopied = ref(false)
 
 // 添加重新生成的事件
 const emit = defineEmits(['regenerate'])
+
+// 添加展开/折叠状态控制
+const isReasoningExpanded = ref(false)
+
+// 切换展开/折叠状态
+const toggleReasoning = () => {
+  isReasoningExpanded.value = !isReasoningExpanded.value
+}
 
 // 处理复制函数
 const handleCopy = async () => {
@@ -152,6 +161,12 @@ onMounted(() => {
 const renderedContent = computed(() => {
   return renderMarkdown(props.message.content)
 })
+
+// 添加 reasoning_content 的渲染
+const renderedReasoning = computed(() => {
+  if (!props.message.reasoning_content) return ''
+  return renderMarkdown(props.message.reasoning_content)
+})
 </script>
 
 <template>
@@ -178,6 +193,21 @@ const renderedContent = computed(() => {
         <img src="@/assets/photo/加载中.png" alt="loading" class="loading-icon" />
         <span>内容生成中...</span>
       </div>
+      <!-- reasoning toggle button -->
+      <div v-if="message.reasoning_content" class="reasoning-toggle" @click="toggleReasoning">
+        <img :src="thinkingIcon" alt="thinking" />
+        <span>深度思考</span>
+        <el-icon class="toggle-icon" :class="{ 'is-expanded': isReasoningExpanded }">
+          <ArrowDown />
+        </el-icon>
+      </div>
+      <!-- reasoning_content -->
+      <div
+        v-if="message.reasoning_content && isReasoningExpanded"
+        class="reasoning markdown-body"
+        v-html="renderedReasoning"
+      ></div>
+      <!-- content -->
       <div class="bubble markdown-body" v-html="renderedContent"></div>
       <!-- 只在 AI 助手消息中显示操作按钮和 tokens 信息 -->
       <div v-if="message.role === 'assistant' && message.loading === false" class="message-actions">
@@ -251,6 +281,71 @@ const renderedContent = computed(() => {
 
   .content {
     max-width: 100%; /* 限制消息气泡最大宽度 */
+
+    .reasoning-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      margin-left: 16px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      width: fit-content;
+      border-radius: 4px;
+      background-color: #eef4ff; // 添加浅蓝色背景
+      transition: background-color 0.2s;
+
+      img {
+        width: 14px;
+        height: 14px;
+      }
+
+      span {
+        font-size: 13px;
+        color: #3f7af1;
+      }
+
+      .toggle-icon {
+        font-size: 12px;
+        color: #3f7af1;
+        transition: transform 0.2s;
+
+        &.is-expanded {
+          transform: rotate(180deg);
+        }
+      }
+
+      &:hover {
+        background-color: #e0ebff; // 调整悬停时的背景色为更深的蓝色
+      }
+    }
+
+    .reasoning {
+      margin-bottom: 8px; // 与下方内容保持间距
+      margin-left: 16px;
+      padding: 0 16px; // 内部内容的边距
+      background-color: #ffffff; // 浅灰色背景，类似引用块
+      border-left: 3px solid #dfe2e5; // 左侧边框，是引用块的特征
+      color: #8b8b8b; // 文字颜色设置为深灰色
+      font-size: 14px; // 字体大小稍小于正文
+      line-height: 1.6; // 行高适中，提高可读性
+
+      // 处理内部段落的样式
+      :deep(p) {
+        margin: 0; // 移除段落默认边距
+        &:not(:last-child) {
+          margin-bottom: 8px; // 段落之间保持间距，最后一个段落不需要
+        }
+      }
+
+      // 处理内部行内代码的样式
+      :deep(code) {
+        background-color: #f0f0f0; // 代码块的背景色
+        padding: 2px 4px; // 代码块的内边距
+        border-radius: 3px; // 圆角边框
+        font-size: 0.9em; // 代码字体稍小
+      }
+    }
 
     .bubble.markdown-body {
       display: inline-block; /* 内联块级元素 */

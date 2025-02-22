@@ -1,9 +1,10 @@
 export const messageHandler = {
-  formatMessage(role, content, files = []) {
+  formatMessage(role, content, reasoning_content = '', files = []) {
     return {
       id: Date.now(),
       role,
       content,
+      reasoning_content,
       files,
       completion_tokens: 0,
       speed: 0,
@@ -16,6 +17,7 @@ export const messageHandler = {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let accumulatedContent = ''
+    let accumulatedReasoning = ''
     let startTime = Date.now()
 
     while (true) {
@@ -30,11 +32,15 @@ export const messageHandler = {
         if (line.startsWith('data: ')) {
           const data = JSON.parse(line.slice(5))
           const content = data.choices[0].delta.content || ''
+          const reasoning = data.choices[0].delta.reasoning_content || ''
+
           accumulatedContent += content
+          accumulatedReasoning += reasoning
 
           // 通过回调更新消息
           updateCallback(
             accumulatedContent,
+            accumulatedReasoning,
             data.usage?.completion_tokens || 0,
             ((data.usage?.completion_tokens || 0) / ((Date.now() - startTime) / 1000)).toFixed(2),
           )
@@ -47,6 +53,7 @@ export const messageHandler = {
   handleNormalResponse(response, updateCallback) {
     updateCallback(
       response.choices[0].message.content,
+      response.choices[0].message.reasoning_content || '',
       response.usage.completion_tokens,
       response.speed,
     )

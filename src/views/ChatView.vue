@@ -45,11 +45,12 @@ onMounted(() => {
 // 发送消息
 const handleSend = async (messageContent) => {
   try {
-    // 添加用户消息，包含文本内容和文件
+    // 添加用户消息
     chatStore.addMessage(
-      messageHandler.formatMessage('user', messageContent.text, messageContent.files),
+      messageHandler.formatMessage('user', messageContent.text, '', messageContent.files),
     )
-    chatStore.addMessage(messageHandler.formatMessage('assistant', ''))
+    // 添加空的助手消息
+    chatStore.addMessage(messageHandler.formatMessage('assistant', '', ''))
 
     // 设置loading状态
     chatStore.setIsLoading(true)
@@ -64,8 +65,8 @@ const handleSend = async (messageContent) => {
     await messageHandler.handleResponse(
       response,
       settingStore.settings.stream,
-      (content, tokens, speed) => {
-        chatStore.updateLastMessage(content, tokens, speed)
+      (content, reasoning_content, tokens, speed) => {
+        chatStore.updateLastMessage(content, reasoning_content, tokens, speed)
       },
     )
   } catch (error) {
