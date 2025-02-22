@@ -5,7 +5,7 @@ export const useSettingStore = defineStore(
   'llm-setting',
   () => {
     const settings = ref({
-      model: 'Qwen/Qwen2.5-72B-Instruct-128K',
+      model: 'deepseek-ai/DeepSeek-R1',
       apiKey: 'sk-yytfutxaprkquzlmjwccenngiuykvrdpbchwmugehkvrsder',
       stream: true,
       maxTokens: 4096,

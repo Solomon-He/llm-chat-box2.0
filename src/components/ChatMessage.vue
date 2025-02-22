@@ -35,7 +35,7 @@ const isCopied = ref(false)
 const emit = defineEmits(['regenerate'])
 
 // 添加展开/折叠状态控制
-const isReasoningExpanded = ref(false)
+const isReasoningExpanded = ref(true)
 
 // 切换展开/折叠状态
 const toggleReasoning = () => {

@@ -47,11 +47,14 @@ const handleSend = async () => {
 
     // 添加用户消息
     messages.value.push(messageHandler.formatMessage('user', searchText.value.trim()))
-    messages.value.push(messageHandler.formatMessage('assistant', ''))
+    messages.value.push(messageHandler.formatMessage('assistant', '', '')) // 添加空的 reasoning_content
 
     // 获取最后一条消息
     const lastMessage = messages.value[messages.value.length - 1]
     lastMessage.loading = true
+
+    // 清空输入框
+    searchText.value = ''
 
     // 调用API获取回复
     const messagesForAPI = messages.value.map(({ role, content }) => ({ role, content }))
@@ -61,15 +64,14 @@ const handleSend = async () => {
     await messageHandler.handleResponse(
       response,
       settingStore.settings.stream,
-      (content, tokens, speed) => {
+      (content, reasoning_content, tokens, speed) => {
+        // 添加 reasoning_content 参数
         lastMessage.content = content
+        lastMessage.reasoning_content = reasoning_content // 更新 reasoning_content
         lastMessage.completion_tokens = tokens
         lastMessage.speed = speed
       },
     )
-
-    // 清空输入框
-    searchText.value = ''
   } catch (error) {
     console.error('Failed to send message:', error)
     const lastMessage = messages.value[messages.value.length - 1]
@@ -90,15 +92,13 @@ const handleRegenerate = async () => {
     // 删除最后两条消息（用户消息和AI回复）
     messages.value.splice(-2, 2)
     // 重新发送最后一条用户消息，但使用新的 id
-    // searchText.value = lastUserMessage.content
-    // 确保消息有新的 id
     const newUserMessage = {
       ...messageHandler.formatMessage('user', lastUserMessage.content),
       id: Date.now(),
     }
     messages.value.push(newUserMessage)
     messages.value.push({
-      ...messageHandler.formatMessage('assistant', ''),
+      ...messageHandler.formatMessage('assistant', '', ''), // 添加空的 reasoning_content
       id: Date.now() + 1,
     })
 
@@ -114,8 +114,10 @@ const handleRegenerate = async () => {
     await messageHandler.handleResponse(
       response,
       settingStore.settings.stream,
-      (content, tokens, speed) => {
+      (content, reasoning_content, tokens, speed) => {
+        // 添加 reasoning_content 参数
         lastMessage.content = content
+        lastMessage.reasoning_content = reasoning_content // 更新 reasoning_content
         lastMessage.completion_tokens = tokens
         lastMessage.speed = speed
       },
@@ -188,121 +190,124 @@ const handleRegenerate = async () => {
 
 <style lang="scss" scoped>
 .search-dialog {
-  width: 640px; // 设置对话框宽度
-  background: #fff; // 设置白色背景
-  border-radius: 8px; // 设置圆角
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // 添加阴影效果
-  overflow: hidden; // 隐藏溢出内容
+  // width: 100%; // 修改为100%宽度
+  max-width: 640px; // 设置最大宽度
+  min-width: 320px; // 设置最小宽度
+  // height: 100%; // 添加高度100%
+  max-height: 600px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   display: flex; // 使用弹性布局
   flex-direction: column; // 垂直排列
 
   .search-header {
-    padding: 16px; // 设置内边距
-    border-bottom: 1px solid #eaeaea; // 添加底部边框
-    display: flex; // 使用弹性布局
-    align-items: center; // 垂直居中
+    flex-shrink: 0; // 防止头部压缩
+    padding: 16px;
+    border-bottom: 1px solid #eaeaea;
 
     .search-input {
-      width: 100%; // 宽度占满容器
-      height: 40px; // 设置固定高度
-      padding: 0 12px; // 左右内边距
-      display: flex; // 使用弹性布局
-      align-items: center; // 垂直居中
-      position: relative; // 为按钮定位提供参考
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      position: relative;
 
       input {
-        width: 100%; // 输入框占满容器宽度
-        height: 100%; // 输入框占满容器高度
-        border: none; // 移除边框
-        outline: none; // 移除轮廓
-        background: none; // 移除背景
-        font-size: 1rem; // 设置字体大小
-        color: #000; // 设置文字颜色
-        padding-right: 40px; // 为按钮留出空间
+        flex: 1; // 输入框占据剩余空间
+        height: 100%;
+        border: none;
+        outline: none;
+        background: none;
+        font-size: 1rem;
+        color: #000;
+        padding-right: 40px;
 
         &::placeholder {
-          color: #999; // 设置占位符颜色
+          color: #999;
         }
       }
 
       .action-btn {
-        position: absolute; // 绝对定位
-        right: 8px; // 距右侧8px
-        top: 50%; // 垂直居中
-        transform: translateY(-50%); // 垂直居中调整
-        width: 28px; // 增加按钮宽度
-        height: 28px; // 增加按钮高度
-        border: none; // 移除边框
-        background: none; // 移除背景
-        padding: 0; // 移除内边距
-        cursor: pointer; // 鼠标指针
-        border-radius: 6px; // 改为正方形圆角
-        display: flex; // 弹性布局
-        align-items: center; // 垂直居中
-        justify-content: center; // 水平居中
-        transition: background-color 0.3s; // 过渡动画
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
 
         img {
-          width: 16px; // 图标宽度
-          height: 16px; // 图标高度
+          width: 16px;
+          height: 16px;
         }
 
         &:hover {
-          background-color: rgba(0, 0, 0, 0.05); // 悬停效果
+          background-color: rgba(0, 0, 0, 0.05);
         }
       }
     }
   }
 
   .dialog-content {
-    padding: 16px; // 设置内边距
-    max-height: 480px; // 设置最大高度
+    flex: 1; // 对话内容区域占据剩余空间
+    padding: 16px;
     overflow-y: auto; // 允许垂直滚动
-    display: flex; // 使用弹性布局
-    flex-direction: column; // 垂直排列
-    gap: 16px; // 子元素间距
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
     .initial-message {
-      padding: 16px 12px; // 设置内边距
-      color: #000; // 设置文字颜色
-      font-size: 14px; // 设置字体大小
-      line-height: 1.5; // 设置行高
-      display: flex; // 使用弹性布局
-      align-items: center; // 垂直居中
+      padding: 16px 12px;
+      color: #000;
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
     }
 
     .suggested-prompts {
-      margin-top: 24px; // 与上方元素的间距
-      display: flex; // 使用弹性布局
-      flex-direction: column; // 垂直排列
-      gap: 12px; // 子元素间距
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
 
       .prompt-title {
         padding-left: 12px;
-        font-size: 12px; // 标题字体大小
-        color: #666; // 标题颜色
+        font-size: 12px;
+        color: #666;
       }
 
       .prompt-list {
-        display: flex; // 使用弹性布局
-        flex-direction: column; // 垂直排列
-        gap: 8px; // 项目间距
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
 
         .prompt-item {
-          text-align: left; // 文字左对齐
-          padding: 8px 12px; // 内边距
-          background: none; // 移除背景
-          border: none; // 移除边框
-          border-radius: 6px; // 设置圆角
-          font-size: 14px; // 设置字体大小
-          color: #000; // 设置文字颜色
-          cursor: pointer; // 鼠标指针样式
-          transition: background-color 0.2s; // 背景色过渡动画
-          display: flex; // 使用弹性布局
-          align-items: center; // 垂直居中
+          text-align: left;
+          padding: 8px 12px;
+          background: none;
+          border: none;
+          border-radius: 6px;
+          font-size: 14px;
+          color: #000;
+          cursor: pointer;
+          transition: background-color 0.2s;
+          display: flex;
+          align-items: center;
 
           &:hover {
-            background-color: #f5f5f5; // 悬停时的背景色
+            background-color: #f5f5f5;
           }
         }
       }
