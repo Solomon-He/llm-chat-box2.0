@@ -34,6 +34,7 @@ src/
 │ ├── ChatMessage.vue # 消息显示组件
 │ ├── DialogEdit.vue # 对话编辑弹窗
 │ ├── PopupMenu.vue # 侧边菜单组件
+│ ├── SearchDialog.vue # 搜索对话框组件
 │ └── SettingsPanel.vue # 设置面板组件
 ├── stores/ # Pinia 状态管理
 │ ├── chat.js # 聊天相关状态
@@ -43,6 +44,7 @@ src/
 │ ├── markdown.js # Markdown 处理
 │ └── messageHandler.js # 消息处理
 ├── views/ # 页面
+│ ├── HomePage.vue # 首页
 │ └── ChatView.vue # 主聊天页面
 └── App.vue # 根组件
 ```
